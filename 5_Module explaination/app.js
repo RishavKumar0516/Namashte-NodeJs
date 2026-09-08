@@ -29,9 +29,9 @@ console.log("x", x); // this is not doable
 // its because IIFE and require function, it keeps function and variable safe.
 
 // how you get access to module.exports?
-// nodeJs passes the module object as parameter to the IIFE function
+// nodeJs passes the module object as parameter to the IIFE function.
 
-
+// nodeJs is very famous because of libuv library.
 
 
 
