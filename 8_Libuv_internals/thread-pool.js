@@ -50,7 +50,7 @@ crypto.pbkdf2("password", "salt", 5000000, 64, "sha512", ()=>{
  * All the networking happens in the sockets. Each socket has the socket descriptor/file descriptor..
  * suppose the connection is made now you want to do write operation, you cannot do anything on the thread, suppose you   get thausand request will you going to make the thausand thread?
  * 
- * No we doesn't going to create the thausand thread. The nodejs doesn't do that.
+ * No we doesn't going to create the thausand thread. The nodejs doesn't do that. Inside the operating system there is some thing called epoll
  * 
  * 
  */
