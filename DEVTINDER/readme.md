@@ -96,3 +96,16 @@ app.get(/.*fly$/, (req, res) => {
  /fly/test
  /butterfly/abc
  /flight
+
+
+
+ <!-- Middlewares -->
+
+ if you don't return any thing from the route handler then it will go in to the infinite loop.
+ ex -
+ app.use("/users", (req, res)=> {
+
+ })
+
+
+ One route can have multiple route handler
