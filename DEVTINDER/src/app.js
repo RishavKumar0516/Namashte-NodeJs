@@ -30,13 +30,41 @@ app.use('/admin', (req, res, next) => {
 //    // }
 // })
 
+// app.get("/admin/getAllData", adminAuth, (req, res)=> {
+//    return res.send("Hello Rishav from getAllData")
+// })
+
+// app.delete('/admin/deleteData', adminAuth, (req, res)=> {
+//    return res.send("Hello Rishav from deleteData")
+// })
+
+
+
+// Error handling
+// use try catch block to handle errors
+
+// but if there are some error that are not handled then ho you can handle that errors
+
+// order of this argument always matters : err, req, res, next
+// if using only 3 argument then order will be: req, res, next
+
+// this only works when its written at the bottom, and it not used the try/catch in the handlers. as code run top to bottom. if you write this at top then, when it runs at first there is no any error.
+
 app.get("/admin/getAllData", adminAuth, (req, res)=> {
-   return res.send("Hello Rishav from getAllData")
+   throw new Error("from getAll Data")
+   // return res.send("Hello Rishav from getAllData")
 })
 
-app.delete('/admin/deleteData', adminAuth, (req, res)=> {
-   return res.send("Hello Rishav from deleteData")
+app.use("/", (err, req, res, next)=> {
+    if (err) {
+       res.status(500).json({message: "Something went wrong"})
+    }
 })
+
+
+
+
+
 
 
 
