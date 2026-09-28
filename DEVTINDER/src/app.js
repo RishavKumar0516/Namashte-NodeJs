@@ -82,20 +82,35 @@ const app = express();
 
 // this is also possible
 
-app.use("/user", 
-    [(req, res, next)=> {
-        console.log("hello1");
-        next();
-    },
-    (req, res, next)=> {
-        console.log("hello2");
-        next();
-    }],
-    (req, res, next)=> {
-        console.log("hello3");
-        res.send("Response 3!!")
-    }
-)
+// app.use("/user", 
+//     [(req, res, next)=> {
+//         console.log("hello1");
+//         next();
+//     },
+//     (req, res, next)=> {
+//         console.log("hello2");
+//         next();
+//     }],
+//     (req, res, next)=> {
+//         console.log("hello3");
+//         res.send("Response 3!!")
+//     }
+// )
+
+EX:4
+app.get("/user", (req, res, next)=> {
+   console.log("1st handler");
+   next();
+})
+
+app.get("/user", (req, res, next)=> {
+   console.log("2nd handler");
+   res.send("Response from 2nd handler")
+})
+
+// this function that is being used in the middle of the request handler is known as middleware
+
+
 
 
 
