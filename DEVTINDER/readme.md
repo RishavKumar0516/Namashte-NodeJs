@@ -221,3 +221,78 @@ app.get("/user", (req, res, next)=> {
 // or the route handler which is calling to the next handler is known as middleware
 
 // GET /users => middleware chain => request handler
+
+
+// as we have used use and written at the top, so this will get called for all the routes that starts with /admin
+
+// handle Auth Middleware for only GET, POST, DELETE methods
+app.use('/admin', (req, res, next) => {
+   const token = "xyz";
+   console.log("Auth check")
+   const isAdminAuthorized = token === "xyz";
+   if (isAdminAuthorized) {
+      next();
+   } else {
+      res.status(401).json({message: "Not Authorized"})
+   }
+})
+
+
+app.get("/admin/getAllData", (req, res)=> {
+   // here if I need to check the user is admin or not then we need to write the logic here as well as inside the other delete route as well, and this is DRY code violation. so to avoid this we can use middleware. we define a middleeare function inside a file and use it here.
+
+   // const token = "xyz";
+   // const isAdminAuthorized = token === "xyz";
+   // if (isAdminAuthorized) {
+   //    res.status(200).json({message: "Hello Rishav"})
+   // } else {
+   //    res.status(401).json({message: "Not Authorized"})
+   // }
+})
+
+app.get("/admin/getAllData", adminAuth, (req, res)=> {
+   return res.send("Hello Rishav from getAllData")
+})
+
+app.delete('/admin/deleteData', adminAuth, (req, res)=> {
+   return res.send("Hello Rishav from deleteData")
+})
+
+
+
+Error handling
+use try catch block to handle errors
+
+but if there are some error that are not handled then ho you can handle that errors
+
+order of this argument always matters : err, req, res, next
+if using only 3 argument then order will be: req, res, next
+
+this only works when its written at the bottom, and it not used the try/catch in the handlers. as code run top to bottom. if you write this at top then, when it runs at first there is no any error.
+
+app.get("/admin/getAllData", adminAuth, (req, res)=> {
+   throw new Error("from getAll Data")
+   // return res.send("Hello Rishav from getAllData")
+})
+
+app.use("/", (err, req, res, next)=> {
+    if (err) {
+       res.status(500).json({message: "Something went wrong"})
+    }
+})
+
+
+DATABASE
+
+before listening to the server, first your database should be connected. It means as soon as the server start listening the user can start making the request, but what if server started listening and database still not connected then user will get the error. so to avoid this, what we will do is export the database connection function from database.js file and call it in app.js file before listening to the server, and use .then() and .catch() to handle the errors.
+
+
+Difference between Javascript and JSON.
+Json always need key as string.
+
+As when you try to send the data from postman in the JSON format, our server is not capable to read the data in the JSON format by default. To read the JSON data we need the help of middleware. where it can read the data from the incoming request and convert it into Javascript object. There is already a middleware is given to us, whose name is express.json().
+
+as we already know that, if we use app.use and don't pass any route path then, it will run for all the routes. so we will write app.use(express.json()) at the top of the file, and so it will run for all the routes.
+
+![alt text](image-4.png)
+ 

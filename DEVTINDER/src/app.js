@@ -1,74 +1,95 @@
+require("dotenv").config();
 const express = require('express');
-const {adminAuth} = require("../middlewares/auth");
-
+const connectDB = require("../configs/database");
+const { adminAuth } = require("../middlewares/auth");
+const User = require("../models/users");
 const app = express();
 
-// as we have used use and written at the top, so this will get called for all the routes that starts with /admin
+app.use(express.json());
 
-// handle Auth Middleware for only GET, POST, DELETE methods
-app.use('/admin', (req, res, next) => {
-   const token = "xyz";
-   console.log("Auth check")
-   const isAdminAuthorized = token === "xyz";
-   if (isAdminAuthorized) {
-      next();
-   } else {
-      res.status(401).json({message: "Not Authorized"})
+app.post("/signup", async (req,res)=>{
+    const user = new User({
+        firstName: "Rishav", 
+        lastName: "Kumar",
+        age: 21,
+        emailId: "merishavkumar@gmail.com",
+        password:"Rishav@123"
+    });
+
+   try {
+       await user.save();
+       res.status(200).send("User added successfully");
+   } catch (error) {
+      res.status(400).send("Error saving user:", error.message);
    }
 })
 
+// get User by email 
+app.get("/user", async (req, res)=> {
+   const userEmail = req.body.emailId;
 
-// app.get("/admin/getAllData", (req, res)=> {
-//    // here if I need to check the user is admin or not then we need to write the logic here as well as inside the other delete route as well, and this is DRY code violation. so to avoid this we can use middleware. we define a middleeare function inside a file and use it here.
+   try {
+      const user = await User.findOne({emailId: userEmail});
 
-//    // const token = "xyz";
-//    // const isAdminAuthorized = token === "xyz";
-//    // if (isAdminAuthorized) {
-//    //    res.status(200).json({message: "Hello Rishav"})
-//    // } else {
-//    //    res.status(401).json({message: "Not Authorized"})
-//    // }
-// })
-
-// app.get("/admin/getAllData", adminAuth, (req, res)=> {
-//    return res.send("Hello Rishav from getAllData")
-// })
-
-// app.delete('/admin/deleteData', adminAuth, (req, res)=> {
-//    return res.send("Hello Rishav from deleteData")
-// })
-
-
-
-// Error handling
-// use try catch block to handle errors
-
-// but if there are some error that are not handled then ho you can handle that errors
-
-// order of this argument always matters : err, req, res, next
-// if using only 3 argument then order will be: req, res, next
-
-// this only works when its written at the bottom, and it not used the try/catch in the handlers. as code run top to bottom. if you write this at top then, when it runs at first there is no any error.
-
-app.get("/admin/getAllData", adminAuth, (req, res)=> {
-   throw new Error("from getAll Data")
-   // return res.send("Hello Rishav from getAllData")
+      if (!user) {
+         res.status(404).send("User not found");
+         return;
+      }
+      res.status(200).send(user);
+   } catch(error) {
+      res.status(400).send("Error finding user:", error.message);
+   }
 })
 
-app.use("/", (err, req, res, next)=> {
-    if (err) {
-       res.status(500).json({message: "Something went wrong"})
-    }
+// feed api
+app.get("/users", async (req, res)=> {
+   try {
+       const users = User.find({});
+
+       if (users.length == 0) {
+          return res.status(400).send("No users found");
+       } 
+
+       return res.status(200).send(users);
+
+   } catch(error) {
+      return res.status(400).send("Error finding users:", error.message);
+   }
 })
 
+// delete user api
+app.delete("/users/:id", async (req, res) => {
+   const userId = req.params.id;
 
-
-
-
-
-
-
-
-app.listen('4000', () => {
-    console.log(`Server is running on port 4000`);
+   try {
+      const user = await User.deleteOne({_id: userId})
+   } catch (error) {
+      res.status(400).send("Error deleting user:", error.message);
+   }
 })
+
+// update the data of user
+app.patch("/user", async (req, res)=> {
+   try {
+      const userId = req.body.userId;
+      const data = req.body;
+      try {
+         const user = await User.findOneAndUpdate({_id: userId}, data, {new: true});
+         return res.status(200).send("User updated successfully");
+      } catch(error) {
+         return res.status(400).send("Error updating user:", error.message);
+      }
+   } catch (error) {
+      return res.status(400).send("Error updating user:", error.message);
+   }
+})
+
+connectDB().then(()=> {
+   console.log("Database connected successfully");
+
+   app.listen(4000, ()=> {
+      console.log("Server is running on port 4000");
+   })
+}).catch((error)=> {
+   console.log("Error while connecting to the database:", error);
+});
