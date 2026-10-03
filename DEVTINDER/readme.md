@@ -295,4 +295,18 @@ As when you try to send the data from postman in the JSON format, our server is 
 as we already know that, if we use app.use and don't pass any route path then, it will run for all the routes. so we will write app.use(express.json()) at the top of the file, and so it will run for all the routes.
 
 ![alt text](image-4.png)
+
+
+
+validation
+
+![alt text](image-7.png)
+
+![alt text](image-6.png)
+
+![alt text](image-8.png)
+
+![alt text](image-5.png)
+
+![alt text](image-9.png)
  
