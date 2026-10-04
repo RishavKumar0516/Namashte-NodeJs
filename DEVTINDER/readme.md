@@ -298,7 +298,7 @@ as we already know that, if we use app.use and don't pass any route path then, i
 
 
 
-validation
+Data Sanitization and Validation
 
 ![alt text](image-7.png)
 
@@ -309,4 +309,36 @@ validation
 ![alt text](image-5.png)
 
 ![alt text](image-9.png)
+ 
+
+The validate function check will only work when creating new document, not while updating existing data.To run the validation fot the existing data we have one option, inside the router file, we can pass one extra option in the findOneAndUpdate function, known as runValidators, and set it to the true
+
+lets use the validator package to validate as well as sanitize the data
+
+Never trust the req.body, as attacker can send any data in the api and that data can get stored in the database.
+
+so the first step should be the validation of the data.
+
+
+
+Encrypting Password
+
+once data is validated then we need to encrypt the password.
+
+when you encrypt a password it takes the password, the hashing algorithm, salting, etc
+
+the salt means the number of round the salt should applied to the hash. Higher the salt, more secure the password will be.
+
+salt can be a random value of any length. the standered hash value is 10.
+
+once this password is encrypt, you cannot decrypt it.
+
+![alt text](image-10.png)
+ 
+
+ never disclose the extra information. if userEmail is not present in the DB, don't tell the user about it. If there is a attacker, they will use the random email Id
+
+ just say invalid credentials, if password or email is not correct.
+
+Authentication, JWT and Cookies
  
