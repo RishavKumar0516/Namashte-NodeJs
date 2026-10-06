@@ -340,7 +340,22 @@ once this password is encrypt, you cannot decrypt it.
 
  just say invalid credentials, if password or email is not correct.
 
+don't pass the whole req.body to the User model. as hacker may can send lot of unwanted data, that can stop your server.
+
+
 Authentication, JWT and Cookies
 
-lets learn
+as we know that when client make the request to the server, TCP/IP connection is being established between them, once the response is returned then connection is closed.
+
+so In TCP/IP protocol, you make the request, get the response and connection is closed.
+
+every time you make a request the user needs to be validate that the request is coming from the authorize source or not.
  
+
+ ![alt text](image-11.png)
+
+ Add the token in the cookie and send the response back to the user.
+
+ we cannot read the cookie directly, to read the cookie we first need to use the cookie-parser package. which will parse the cookies and make them available in the request object.
+
+ once the cookie is generated and sended, then its job of the browser to store it. next time when the user make the request, the browser will send the cookie to the server with the request.

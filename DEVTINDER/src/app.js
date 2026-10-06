@@ -2,6 +2,8 @@ require("dotenv").config();
 const express = require('express');
 const connectDB = require("../configs/database");
 const { adminAuth } = require("../middlewares/auth");
+const bcrypt = require("bcrypt");
+const cookieParser = require("cookie-parser");
 const User = require("../models/users");
 
 const { validateSignUpData } = require("../utils/validation");
@@ -9,17 +11,52 @@ const { validateSignUpData } = require("../utils/validation");
 const app = express();
 
 app.use(express.json());
+app.use(cookieParser());
 
 app.post("/signup", async (req, res) => {
 
    try {
       validateSignUpData(req);
 
-      const user = new User(req.body);
+      const {password} = req.body;
+
+      const salt = await bcrypt.getSalt(10);
+      const hashedPassword = await bcrypt.hash(password, salt);
+
+      req.body.password = hashedPassword;
+
+      // don't pass the whole req.body to the User model. as hacker may can send lot of unwanted data, that can stop your server.
+      const user = new User({
+         firstName,
+         lastName,
+         emailId,
+         password
+      });
       await user.save();
       res.status(200).send("User added successfully");
    } catch (error) {
       res.status(400).send("Error saving user:", error.message);
+   }
+})
+
+app.post("/login", async (req, res) => {
+   const {emailId, password} = req.body;
+
+   try {
+      const user = User.findOne({emailId: emailId});
+      if (!user) {
+         return res.status(404).send("User credentials are not correct");
+      }
+
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+
+      if (!isPasswordValid) {
+         return res.status(400).send("User credentials are not correct");
+      }
+
+      res.status(200).send("User logged in successfully");
+   } catch(error) {
+      res.status(400).send("Error logging in:", error.message);
    }
 })
 
