@@ -1,4 +1,4 @@
-
+const jwt = require('jsonwebtoken');
 
 const adminAuth = (req, res)=> {
    
@@ -14,6 +14,19 @@ const adminAuth = (req, res)=> {
    
 };
 
+const userAuth = async (req, res, next) => {
+    const { token } = req.cookies;
+
+    const isValidUser = await jwt.verify(token, process.env.JWT_SECRET);
+
+    if (!isValidUser) {
+        throw new Error("Invalid User");
+    }
+
+    next();
+}
+
 module.exports = {
-    adminAuth
+    adminAuth,
+    userAuth
 }

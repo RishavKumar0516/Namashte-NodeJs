@@ -1,17 +1,23 @@
 require("dotenv").config();
 const express = require('express');
 const connectDB = require("../configs/database");
-const { adminAuth } = require("../middlewares/auth");
-const bcrypt = require("bcrypt");
+const { adminAuth, userAuth } = require("../middlewares/auth");
+const bcrypt = require("bcryptjs");
 const cookieParser = require("cookie-parser");
+const jwt = require("jsonwebtoken")
 const User = require("../models/users");
+const authRouter = require("../routes/auth");
 
-const { validateSignUpData } = require("../utils/validation");
+const { validateSignUpData } = require("./utils/validation");
 
 const app = express();
 
 app.use(express.json());
 app.use(cookieParser());
+
+// use router to manage routes
+// it will look for the route handler inside authRouter.js file when the url starts with "/auth".
+app.use("/auth", authRouter)
 
 app.post("/signup", async (req, res) => {
 
@@ -50,6 +56,11 @@ app.post("/login", async (req, res) => {
 
       const isPasswordValid = await bcrypt.compare(password, user.password);
 
+      // offloading the JWT generation logic to the user model
+      const token = await user.getJWT();
+
+      req.cookie("token", token);
+
       if (!isPasswordValid) {
          return res.status(400).send("User credentials are not correct");
       }
@@ -65,6 +76,17 @@ app.get("/user", async (req, res) => {
    const userEmail = req.body.emailId;
 
    try {
+
+      const {token} = req.cookies;
+
+      const isUserValid = await jwt.verify(token, process.env.JWT_SECRET);
+
+      if (!isUserValid) {
+         res.status(400).send("User is not valid");
+         return;
+      }
+      
+
       const user = await User.findOne({ emailId: userEmail });
 
       if (!user) {
@@ -78,7 +100,7 @@ app.get("/user", async (req, res) => {
 })
 
 // feed api
-app.get("/users", async (req, res) => {
+app.get("/users", userAuth, async (req, res) => {
    try {
       const users = User.find({});
 

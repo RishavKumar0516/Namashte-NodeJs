@@ -359,3 +359,25 @@ every time you make a request the user needs to be validate that the request is 
  we cannot read the cookie directly, to read the cookie we first need to use the cookie-parser package. which will parse the cookies and make them available in the request object.
 
  once the cookie is generated and sended, then its job of the browser to store it. next time when the user make the request, the browser will send the cookie to the server with the request.
+
+ As every user have their own JWT method, so what we can do is use the mongoose schema method and define that functionality inside that. alo make sure that whenever you are creating this function, make sure, you use function keyword not the arrow function.
+
+ whenever you create instance of schema(user model), it will represent that particular instance.
+ this makes your code cleaner, readable etc.
+
+
+ # Router
+
+const app = express();
+
+const router = express.Router();
+ this both below code are same
+ app.use("/test", (req, res, next)=> {
+    console.log("hello1");
+    next();
+ })
+
+ router.use("/test", (req, res, next)=> {
+    console.log("hello2");
+    next();
+ })
